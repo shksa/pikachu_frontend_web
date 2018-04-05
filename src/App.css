@@ -8,7 +8,8 @@
     justify-content: center;
     align-items: center;
     background-color: #137dd3;
-    font-size: 20px;
+    font-size: 50px;
+    color: #9df538;
 }
 .App-body {
     height: 85%;
@@ -18,22 +19,51 @@
     background-color: #9df538
 }
 .App-body-img-selector {
-    height: 50%;
+    height: 60%;
     width: 50%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
 }
-.image-holder {
+.image-and-result {
     height: 60%;
+    width: 80%;
+    display: flex;
+    justify-content: center;
+}
+.image-holder {
+    width: 45%;
+}
+.is-and-result {
+    width: 55%;
+    display: flex;
+}
+.is-holder {
+    width: 20%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px;
+}
+.result-holder {
+    width: 80%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* background-color: #720532; */
+    font-size: 30px;
+}
+.question-image {
+    height: 100%;
+    width: 100%;
 }
 .error-msg {
     height: 10%;
 }
 .upload-button {
     height: 10%;
-    width: 10%;
+    width: 100px;
     background-color: #13d3a3;
     cursor: pointer;
     outline: none;
