@@ -63,7 +63,11 @@ class App extends Component {
               }
 
             </div>
-            <input className="image-input" type="file" onChange={this.fileChangeHandler} />
+            <div className="image-input" >
+              <button className="image-selection-button"> Pick an image </button>
+              <input type="file" onChange={this.fileChangeHandler} />
+            </div>
+
             <button className="upload-button" onClick={this.uploadHandler}>Recognize!</button>
             <div className="error-msg">{this.state.showErrorMsg ? 'Please select an image and then press recognize' : ''}</div>
           </div>

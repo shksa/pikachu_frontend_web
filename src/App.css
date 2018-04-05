@@ -9,14 +9,13 @@
     align-items: center;
     background-color: #137dd3;
     font-size: 50px;
-    color: #9df538;
+    color: white;
 }
 .App-body {
     height: 85%;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #9df538
 }
 .App-body-img-selector {
     height: 60%;
@@ -60,6 +59,30 @@
 }
 .error-msg {
     height: 10%;
+}
+.image-input {
+    height: 8%;
+    width: 20%;
+    overflow: hidden;
+    position: relative;
+}
+.image-input > input[type="file"] {
+    font-size: 100px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    opacity: 0;
+    cursor: pointer;
+} 
+.image-selection-button {
+    display: inline-block;
+    height: 100%;
+    width: 100%;
+    background-color: #035e58;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 15px;
 }
 .upload-button {
     height: 10%;
