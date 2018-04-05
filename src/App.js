@@ -1,23 +1,23 @@
 import React, { Component } from 'react'
 import defaultImage from './default-image.png'
 import questionMarkImage from './DramaticQuestionMark.png'
-import { uploadImage } from './controller'
+import { recognizeImage } from './controller'
 import './App.css'
 
 class App extends Component {
   constructor(props) {
     super(props)
-    this.state = { selectedFile: null, showErrorMsg: false, answer: null }
+    this.state = { selectedFile: null, showErrorMsg: false, predictions: null }
   }
 
   fileChangeHandler = (event) => {
-    this.setState({ selectedFile: event.target.files[0], showErrorMsg: false })
+    this.setState({ selectedFile: event.target.files[0], showErrorMsg: false, predictions: null })
   }
 
   uploadHandler = () => {
     if (this.state.selectedFile) {
-      const answerPromise = uploadImage(this.state.selectedFile)
-      answerPromise.then(answer => this.setState({ answer }))
+      const predictionsPromise = recognizeImage(this.state.selectedFile)
+      predictionsPromise.then(predictions => this.setState({ predictions }))
     } else {
       this.setState({ showErrorMsg: true })
     }
@@ -45,7 +45,16 @@ class App extends Component {
                     is
                     </div>
                     <div className="result-holder">
-                      {this.state.answer ? this.state.answer : <img className="question-image" src={questionMarkImage} alt="questionmark" /> }
+                      {
+                        this.state.predictions ?
+                        (
+                          <ul>
+                            {this.state.predictions.map(prediction => <li>{prediction}</li>)}
+                          </ul>
+                        )
+                        :
+                          <img className="question-image" src={questionMarkImage} alt="questionmark" />
+                      }
                     </div>
                   </div>
                 )
@@ -56,7 +65,7 @@ class App extends Component {
             </div>
             <input className="image-input" type="file" onChange={this.fileChangeHandler} />
             <button className="upload-button" onClick={this.uploadHandler}>Recognize!</button>
-            <div className="error-msg">{this.state.showErrorMsg ? 'Please select an image and then upload' : ''}</div>
+            <div className="error-msg">{this.state.showErrorMsg ? 'Please select an image and then press recognize' : ''}</div>
           </div>
         </div>
       </div>

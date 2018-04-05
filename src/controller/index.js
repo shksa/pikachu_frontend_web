@@ -1,5 +1,5 @@
 const { ping } = require('./ping');
-const { uploadImage } = require('./uploadImage');
+const { recognizeImage } = require('./recognizeImage');
 
-module.exports = { ping, uploadImage };
+module.exports = { ping, recognizeImage };
 
