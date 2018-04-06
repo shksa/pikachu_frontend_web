@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import defaultImage from './default-image.png'
-import questionMarkImage from './DramaticQuestionMark.png'
+import defaultImage from './images/default-image.png'
+import questionMarkImage from './images/DramaticQuestionMark.png'
 import { recognizeImage } from './controller'
 import './App.css'
 
@@ -10,7 +10,7 @@ class App extends Component {
     this.state = {
       selectedFile: null, showErrorMsg: false, predictions: null, activeTab: '0',
     }
-    this.video = null;
+    this.videoElem = null;
   }
 
   fileChangeHandler = (event) => {
@@ -35,10 +35,9 @@ class App extends Component {
 
     navigator.mediaDevices.getUserMedia(constraints)
       .then((mediaStream) => {
-        const { video } = this
-        video.srcObject = mediaStream
-        video.onloadedmetadata = (e) => {
-          video.play()
+        this.videoElem.srcObject = mediaStream
+        this.videoElem.onloadedmetadata = (e) => {
+          this.videoElem.play()
         }
         console.log('inside then method of getUserMedia')
       })
@@ -116,7 +115,7 @@ class App extends Component {
             (
               <div className="App-body-video-capture" >
                 <button className="capture-video-button" onClick={this.startRecording}>Capture video</button>
-                <video width="60%" height="60%" controls ref={(vid) => { this.video = vid }} />
+                <video width="60%" height="60%" ref={(vid) => { this.videoElem = vid }} controls />
               </div>
             )
           }

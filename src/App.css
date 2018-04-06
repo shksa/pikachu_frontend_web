@@ -18,13 +18,14 @@
 .tab-button {
     width: 50%;
     border: none;
-    font-size: 30px;
+    font-size: 35px;
     cursor: pointer;
     outline: none;
+    box-shadow: 2px 2px grey;
 }
 .active-tab-button {
-    background-color: black;
-    color: white;
+    background-color: #13d3a3;
+    color: #18413d;
 }
 .inactive-tab-button {
     color: black;
