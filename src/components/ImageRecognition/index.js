@@ -32,7 +32,7 @@ class ImageRecognition extends Component {
   }
 
   setImageFile = (event) => {
-    this.setState({ selectedFile: event.target.files[0] })
+    this.setState({ selectedFile: event.target.files[0], toShowErrorMsg: false })
   }
 
   render() {
@@ -75,7 +75,7 @@ class ImageRecognition extends Component {
           <input type="file" onChange={this.setImageFile} />
         </div>
 
-        <button className="upload-button" onClick={this.uploadHandler}>Recognize!</button>
+        <button className="action-button" onClick={this.uploadHandler}>Recognize!</button>
         <div className="error-msg">{this.state.toShowErrorMsg ? 'Please select an image and then press recognize' : ''}</div>
       </div>
     )

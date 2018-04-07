@@ -93,7 +93,7 @@
         font-size: 15px;
     }
 }
-.upload-button {
+.action-button {
     height: 10%;
     width: 20%;
     background-color: #13d3a3;
@@ -105,7 +105,7 @@
     font-size: 25px;
 }
 @media only screen and (max-width: 400px) {
-    .upload-button {
+    .action-button {
         width: 50%;
         font-size: 15px;
     }

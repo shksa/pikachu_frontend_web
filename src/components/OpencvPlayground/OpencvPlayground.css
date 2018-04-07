@@ -1,28 +1,23 @@
 .opencv-playground {
     width: 80%;
-    height: 70%;
+    height: 80%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
 }
+@media only screen and (max-width: 1024px) {
+    .opencv-playground {
+        width: 100%;
+    }
+}
 .canvases-container {
     width: 90%;
-    height: 70%;
+    height: 60%;
     display: flex;
     justify-content: space-around;
 }
 .canvas-img-holder {
     width: 45%;
-}
-.turn-grey-button {
-    height: 10%;
-    width: 20%;
-    background-color: #13d3a3;
-    cursor: pointer;
-    outline: none;
-    border: none;
-    color: white;
-    border-radius: 10px;
-    font-size: 25px;
+    border: 1px solid black;
 }
