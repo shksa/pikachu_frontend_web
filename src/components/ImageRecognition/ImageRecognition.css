@@ -1,0 +1,103 @@
+.App-body-img-selector {
+    height: 80%;
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+@media only screen and (max-width: 1024px) {
+    .App-body-img-selector {
+        width: 100%;
+    }
+}
+@media only screen and (min-width: 1024px) {
+    .image-and-result {
+        width: 70%;
+    }
+}
+@media only screen and (max-width: 400px) {
+    .image-and-result {
+        width: 100%;
+    }
+}
+
+.image-and-result {
+    height: 60%;
+    display: flex;
+    justify-content: center;
+}
+.image-holder {
+    width: 50%;
+}
+.is-and-result {
+    display: flex;
+}
+.is-holder {
+    width: 20%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px;
+}
+.result-holder {
+    width: 80%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* background-color: #720532; */
+    font-size: 30px;
+}
+.question-image {
+    height: 100%;
+    width: 100%;
+}
+.image-input {
+    height: 10%;
+    width: 22%;
+    overflow: hidden;
+    position: relative;
+}
+.image-input > input[type="file"] {
+    font-size: 100px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    opacity: 0;
+    cursor: pointer;
+} 
+.image-selection-button {
+    display: inline-block;
+    height: 100%;
+    width: 100%;
+    background-color: #035e58;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 25px;
+}
+@media only screen and (max-width: 400px) {
+    .image-input {
+        width: 50%;
+        font-size: 15px;
+    }
+}
+.upload-button {
+    height: 10%;
+    width: 20%;
+    background-color: #13d3a3;
+    cursor: pointer;
+    outline: none;
+    border: none;
+    color: white;
+    border-radius: 10px;
+    font-size: 25px;
+}
+@media only screen and (max-width: 400px) {
+    .upload-button {
+        width: 50%;
+    }
+}
+.error-msg {
+    height: 10%;
+}

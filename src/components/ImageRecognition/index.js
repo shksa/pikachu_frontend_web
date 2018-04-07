@@ -42,7 +42,7 @@ class ImageRecognition extends Component {
           <img
             src={this.state.selectedFile ? window.URL.createObjectURL(this.state.selectedFile) : defaultImage}
             alt="selected img"
-            className="image-holder"
+            className={this.state.selectedFile ? 'image-holder' : ''}
           />
           {
             this.state.selectedFile ?

@@ -11,7 +11,7 @@ class VideoRecognition extends Component {
 
   startOrStopRecord = () => {
     if (!this.state.streaming) {
-      const resolution = { width: { exact: 500 }, height: { exact: 500 } }
+      const resolution = { width: { exact: 300 }, height: { exact: 300 } }
       this.startCamera(resolution)
     } else {
       this.stopCamera()

@@ -17,6 +17,7 @@
     flex-wrap: wrap;
 }
 .tab-button {
+    padding: 0.5% 0%;
     width: 50%;
     border: none;
     font-size: 35px;
@@ -37,106 +38,4 @@
     display: flex;
     justify-content: center;
     align-items: center;
-}
-.App-body-img-selector {
-    height: 80%;
-    width: 70%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-}
-.App-body-video-capture {
-    height: 80%;
-    width: 80%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-around;
-}
-.image-and-result {
-    height: 60%;
-    width: 80%;
-    display: flex;
-    justify-content: center;
-}
-.image-holder {
-    width: 45%;
-}
-.is-and-result {
-    width: 55%;
-    display: flex;
-}
-.is-holder {
-    width: 20%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 30px;
-}
-.result-holder {
-    width: 80%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    /* background-color: #720532; */
-    font-size: 30px;
-}
-.question-image {
-    height: 100%;
-    width: 100%;
-}
-.error-msg {
-    height: 10%;
-}
-.image-input {
-    height: 10%;
-    width: 20%;
-    overflow: hidden;
-    position: relative;
-}
-.image-input > input[type="file"] {
-    font-size: 100px;
-    position: absolute;
-    top: 0;
-    right: 0;
-    opacity: 0;
-    cursor: pointer;
-} 
-.image-selection-button {
-    display: inline-block;
-    height: 100%;
-    width: 100%;
-    background-color: #035e58;
-    border: none;
-    border-radius: 10px;
-    color: white;
-    font-size: 15px;
-}
-.upload-button {
-    height: 10%;
-    width: 20%;
-    background-color: #13d3a3;
-    cursor: pointer;
-    outline: none;
-    border: none;
-    color: white;
-    border-radius: 10px;
-    font-size: 15px;
-}
-.capture-video-button {
-    background-color: #035e58;
-    height: 10%;
-    width: 30%;
-    border-radius: 10px;
-    font-size: 20px;
-    color: white;
-    cursor: pointer;
-    outline: none;
-}
-.video-holder {
-    border: 2px solid black;
-    background-color: black;
-    width: 50%;
-    height: 70%;
 }
