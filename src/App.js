@@ -8,13 +8,14 @@ class App extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      selectedFile: null, showErrorMsg: false, predictions: null, activeTab: '0',
+      selectedFile: null,
+      showErrorMsg: false,
+      predictions: null,
+      activeTab: '0',
+      streaming: false,
     }
-    this.videoElem = null;
-  }
-
-  fileChangeHandler = (event) => {
-    this.setState({ selectedFile: event.target.files[0], showErrorMsg: false, predictions: null })
+    this.videoElem = null
+    this.videoStream = null
   }
 
   uploadHandler = () => {
@@ -26,26 +27,59 @@ class App extends Component {
     }
   }
 
-  showTab = (event) => {
-    this.setState({ activeTab: event.target.name })
+  onVideoStarted = () => {
+    console.log('in onVideoStarted')
+    this.setState({ streaming: true })
   }
 
-  startRecording = () => {
-    const constraints = { audio: false, video: { width: 500, height: 500 } }
+  onVideoStopped = () => {
+    console.log('in onVideoStopped')
+    this.setState({ streaming: false })
+  }
 
-    navigator.mediaDevices.getUserMedia(constraints)
+  startCamera = (resolution) => {
+    const videoConstraints = { video: resolution, audio: false }
+    navigator.mediaDevices.getUserMedia(videoConstraints)
       .then((mediaStream) => {
         this.videoElem.srcObject = mediaStream
         this.videoElem.onloadedmetadata = (e) => {
           this.videoElem.play()
         }
-        console.log('inside then method of getUserMedia')
+        this.videoStream = mediaStream
       })
       .catch((err) => { console.log(`${err.name}: ${err.message}`); })
   }
 
+  stopCamera = () => {
+    this.videoElem.pause()
+    this.videoElem.srcObject = null
+    this.videoStream.getVideoTracks()[0].stop()
+  }
+
+  startOrStopRecord = () => {
+    if (!this.state.streaming) {
+      const resolution = { width: { exact: 500 }, height: { exact: 500 } }
+      this.startCamera(resolution)
+    } else {
+      this.stopCamera()
+      this.onVideoStopped()
+    }
+  }
+
+  fileChangeHandler = (event) => {
+    this.setState({ selectedFile: event.target.files[0], showErrorMsg: false, predictions: null })
+  }
+
+  showTab = (event) => {
+    this.setState({ activeTab: event.target.name })
+  }
+
+  setVideoEleRef = (videoElem) => {
+    this.videoElem = videoElem
+  }
+
   render() {
-    console.log('in render, state.selectedFile is ', this.state.selectedFile)
+    console.log('in render, state is ', this.state, 'videoEle and videoStream is ', this.videoElem, this.videoStream)
     return (
       <div className="App">
         <div className="App-header" >
@@ -114,8 +148,14 @@ class App extends Component {
             :
             (
               <div className="App-body-video-capture" >
-                <button className="capture-video-button" onClick={this.startRecording}>Capture video</button>
-                <video width="60%" height="60%" ref={(vid) => { this.videoElem = vid }} controls />
+                <button className="capture-video-button" onClick={this.startOrStopRecord}>
+                  {this.state.streaming ? 'Stop capture' : 'Start capture'}
+                </button>
+                <video
+                  className="video-holder"
+                  ref={this.setVideoEleRef}
+                  onCanPlay={this.onVideoStarted}
+                />
               </div>
             )
           }
