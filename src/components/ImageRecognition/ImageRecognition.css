@@ -83,6 +83,11 @@
     font-size: 25px;
 }
 @media only screen and (max-width: 400px) {
+    .image-selection-button {
+        font-size: 15px;
+    } 
+}
+@media only screen and (max-width: 400px) {
     .image-input {
         width: 50%;
         font-size: 15px;
@@ -102,6 +107,7 @@
 @media only screen and (max-width: 400px) {
     .upload-button {
         width: 50%;
+        font-size: 15px;
     }
 }
 .error-msg {

@@ -13,6 +13,7 @@
 }
 .tab-selector {
     display: flex;
+    /* flex-wrap: wrap; */
     justify-content: space-between;
 }
 .tab-button {
@@ -23,6 +24,11 @@
     cursor: pointer;
     outline: none;
     box-shadow: 2px 2px grey;
+}
+@media only screen and (max-width: 550px) {
+    .tab-button {
+        font-size: 15px;
+    }
 }
 .active-tab-button {
     background-color: #13d3a3;

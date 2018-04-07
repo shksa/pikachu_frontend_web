@@ -21,6 +21,13 @@
     cursor: pointer;
     outline: none;
 }
+
+@media only screen and (max-width: 400px) {
+    .capture-video-button{
+        font-size: 15px;
+    }
+}
+
 .video-holder {
     border: 2px solid black;
     background-color: black;
