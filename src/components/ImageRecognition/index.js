@@ -56,7 +56,7 @@ class ImageRecognition extends Component {
                     this.state.predictions ?
                     (
                       <ul>
-                        {this.state.predictions.map(prediction => <li>{prediction}</li>)}
+                        {this.state.predictions.map(prediction => <li key={prediction} >{prediction}</li>)}
                       </ul>
                     )
                     :

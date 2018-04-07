@@ -31,6 +31,7 @@
     width: 50%;
 }
 .is-and-result {
+    width: 50%;
     display: flex;
 }
 .is-holder {
@@ -47,6 +48,11 @@
     align-items: center;
     /* background-color: #720532; */
     font-size: 30px;
+}
+@media only screen and (max-width: 400px) {
+    .result-holder {
+        font-size: 25px;
+    }
 }
 .question-image {
     height: 100%;
