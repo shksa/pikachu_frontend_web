@@ -1,0 +1,17 @@
+.opencv-playground {
+    width: 80%;
+    height: 70%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+.canvases-container {
+    width: 90%;
+    height: 80%;
+    display: flex;
+    justify-content: space-around;
+}
+.canvas-img-holder {
+    width: 45%;
+}

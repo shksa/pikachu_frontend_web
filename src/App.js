@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import ImageRecognition from './components/ImageRecognition'
 import VideoRecognition from './components/VideoRecognition'
+import OpencvPlayground from './components/OpencvPlayground'
 import './App.css'
 
 class App extends Component {
@@ -15,10 +16,15 @@ class App extends Component {
     this.setState({ activeTab: event.target.name })
   }
 
+  onOpenvLoad = () => {
+    this.setState({ isOpenCVloaded: true })
+  }
+
   render() {
     console.log('in render, state is ', this.state)
     return (
       <div className="App">
+        <div id="openCVloader" style={{textAlign: 'center'}}>OpenCV.js is loading ...</div>
         <div className="App-header" >
           Pikachu
         </div>
@@ -35,16 +41,25 @@ class App extends Component {
             name="1"
           >Video recognition
           </button>
+          <button
+            className={this.state.activeTab === '2' ? 'tab-button active-tab-button' : 'tab-button inactive-tab-button'}
+            onClick={this.showTab}
+            name="2"
+          >OpenCV Playground
+          </button>
         </div>
         <div className="App-body" >
           {
             this.state.activeTab === '0' ?
               <ImageRecognition />
             :
+            this.state.activeTab === '1' ?
               <VideoRecognition />
+            :
+              <OpencvPlayground />
           }
-
         </div>
+
       </div>
     );
   }
