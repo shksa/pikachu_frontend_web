@@ -1,5 +1,5 @@
 const recognizeImage = (imageFile) => {
-  console.log('in uploadImage func')
+  console.log('in recognizeImage func')
   const formData = new FormData();
   formData.append('userName', 'guest');
   formData.append('userImage', imageFile);
