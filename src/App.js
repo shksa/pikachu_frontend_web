@@ -16,10 +16,6 @@ class App extends Component {
     this.setState({ activeTab: event.target.name })
   }
 
-  onOpenvLoad = () => {
-    this.setState({ isOpenCVloaded: true })
-  }
-
   render() {
     console.log('in render, state is ', this.state)
     return (
