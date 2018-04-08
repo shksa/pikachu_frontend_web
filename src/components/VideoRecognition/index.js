@@ -5,15 +5,20 @@ import './VideoRecognition.css'
 class VideoRecognition extends Component {
   constructor(props) {
     super(props)
-    this.state = { streaming: false }
+    this.state = { streaming: false, toShowErrorMsg: false }
     this.videoElem = null
     this.videoStream = null
     this.canvasOutput = null
+    this.canvasInput = null
+  }
+
+  showErrorMsg = () => {
+    this.setState({ toShowErrorMsg: true })
   }
 
   startOrStopRecord = () => {
     if (!this.state.streaming) {
-      const resolution = { width: { exact: 400 }, height: { exact: 400 } }
+      const resolution = { width: { exact: 300 }, height: { exact: 300 } }
       this.startCamera(resolution)
     } else {
       this.stopCamera()
@@ -41,41 +46,68 @@ class VideoRecognition extends Component {
   }
 
   processVideo = () => {
-    let src = new window.cv.Mat(this.videoElem.height, this.videoElem.width, window.cv.CV_8UC4);
-    let dst = new window.cv.Mat(this.videoElem.height, this.videoElem.width, window.cv.CV_8UC1);
+    if(this.state.streaming) {
+      let src = new window.cv.Mat(this.videoElem.videoHeight, this.videoElem.videoWidth, window.cv.CV_8UC4)
+      let dst = new window.cv.Mat(this.videoElem.videoHeight, this.videoElem.videoWidth, window.cv.CV_8UC1)
+      let cap = new window.cv.VideoCapture(this.videoElem)
+      console.log(cap)
+      const FPS = 30;
+      const processFrames = () => {
+        if (!this.state.streaming) {
+          src.delete()
+          dst.delete()
+          return
+        }
+        let begin = Date.now()
+        cap.read(src)
+        console.log()
+        window.cv.cvtColor(src, dst, window.cv.COLOR_RGBA2GRAY)
+        window.cv.imshow(this.canvasOutput, dst)
+        let delay = 1000/FPS - (Date.now() - begin)
+        setTimeout(processFrames, delay)
+      }
+      setTimeout(processFrames, 0)
+    } else {
+      this.showErrorMsg()
+    }
+    
+  }
+
+  drawVideoToInputCanvas = () => {
+    let src = new window.cv.Mat(this.videoElem.videoHeight, this.videoElem.videoWidth, window.cv.CV_8UC4)
     let cap = new window.cv.VideoCapture(this.videoElem);
-    console.log(cap)
+    console.log(cap, src)
     const FPS = 30;
-    function processFrames() {
+    const drawFrameToInputCanvas = () => {
       if (!this.state.streaming) {
-        // clean and stop.
         src.delete();
-        dst.delete();
+        console.log('src of drawVideoToInputCanvas deleted')
         return;
       }
       let begin = Date.now();
       cap.read(src);
-      window.cv.cvtColor(src, dst, window.cv.COLOR_RGBA2GRAY);
-      window.cv.imshow(this.canvasOutput, dst);
+      window.cv.imshow(this.canvasInput, src);
       let delay = 1000/FPS - (Date.now() - begin);
-      setTimeout(processFrames.bind(this), delay);
+      setTimeout(drawFrameToInputCanvas, delay);
     }
-    console.log('after processFrames func definition')
-    setTimeout(processFrames.bind(this), 0);
+    setTimeout(drawFrameToInputCanvas, 0);
   }
 
   onVideoStarted = () => {
     console.log('in onVideoStarted')
+    this.setState({ streaming: true })
     this.videoElem.height = this.videoElem.videoHeight
     this.videoElem.width = this.videoElem.videoWidth
+    this.canvasInputCtx = this.canvasInput.getContext('2d')
     this.canvasOutputCtx = this.canvasOutput.getContext('2d')
-    this.setState({ streaming: true })
+    this.drawVideoToInputCanvas()
   }
 
   onVideoStopped = () => {
     console.log('in onVideoStopped')
     this.setState({ streaming: false })
     this.canvasOutputCtx.clearRect(0, 0, this.canvasOutput.width, this.canvasOutput.height)
+    this.canvasInputCtx.clearRect(0, 0, this.canvasOutput.width, this.canvasOutput.height)
   }
 
   setVideoEleRef = (videoElem) => {
@@ -86,6 +118,12 @@ class VideoRecognition extends Component {
     this.canvasOutput = canvasOutputElem
   }
 
+  setCanvasVideoInputRef = (canvasInputElem) => {
+    this.canvasInput = canvasInputElem
+  }
+
+  toShowErrorMsg
+
   render() {
     return (
       <div className="App-body-video-capture" >
@@ -95,13 +133,14 @@ class VideoRecognition extends Component {
             ref={this.setVideoEleRef}
             onCanPlay={this.onVideoStarted}
           />
+          <canvas ref={this.setCanvasVideoInputRef} className="canvas-video-holder" />
           <canvas ref={this.setCanvasVideoOutputRef} className="canvas-video-holder" />
         </div>
         <button className="capture-video-button" onClick={this.startOrStopRecord}>
           {this.state.streaming ? 'Stop capture' : 'Start capture'}
         </button>
         <button className="action-button" onClick={this.processVideo}>Process Video</button>
-        <div className="error-msg">{this.state.toShowErrorMsg ? 'Please select an image and then press turn to Grey' : ''}</div>
+        <div className="error-msg">{this.state.toShowErrorMsg ? 'Please select capture video and then press process video' : ''}</div>
       </div>
     )
   }
