@@ -25,7 +25,7 @@ class OpencvPlayground extends Component {
     if (this.state.selectedFile) {
       const src = window.cv.imread(this.canvasInput)
       const dst = new window.cv.Mat();
-      window.cv.cvtColor(src, dst, window.cv.COLOR_RGBA2GRAY);
+      window.cv.cvtColor(src, dst, window.cv.COLOR_RGBA2BGRA);
       window.cv.imshow(this.canvasOutput, dst);
       src.delete();
       dst.delete();
@@ -44,7 +44,7 @@ class OpencvPlayground extends Component {
   emptyOutputCanvas = () => {
     const canvasOutputCtx = this.canvasOutput.getContext('2d')
     canvasOutputCtx.fillStyle = '#FFFFFF'
-    canvasOutputCtx.fillRect(0, 0, this.canvasInput.width, this.canvasInput.height)
+    canvasOutputCtx.clearRect(0, 0, this.canvasInput.width, this.canvasInput.height)
   }
 
   setCanvasInputRef = (canvasInputElem) => {
