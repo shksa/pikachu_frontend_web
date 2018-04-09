@@ -43,7 +43,6 @@ class OpencvPlayground extends Component {
 
   emptyOutputCanvas = () => {
     const canvasOutputCtx = this.canvasOutput.getContext('2d')
-    canvasOutputCtx.fillStyle = '#FFFFFF'
     canvasOutputCtx.clearRect(0, 0, this.canvasInput.width, this.canvasInput.height)
   }
 

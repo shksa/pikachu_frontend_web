@@ -1,15 +1,8 @@
-const recognizeImage = (imageFile, imageMat) => {
+const recognizeImage = (imageFile) => {
   console.log('in recognizeImage func')
   const formData = new FormData()
   formData.append('userName', 'guest')
-  if (imageFile){
-    formData.append('imageFile', imageFile)
-    console.log('sending image file ', imageFile)
-  } else {
-    const imageBuffer = imageMat.data()
-    formData.append('imageBuffer', imageBuffer)
-    console.log('sending imageBuffer ', imageBuffer)
-  }
+  formData.append('imageFile', imageFile)
   return fetch('/recognizeImage', {
     method: 'POST',
     body: formData,

@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import ImageRecognition from './components/ImageRecognition'
 import VideoRecognition from './components/VideoRecognition'
 import OpencvPlayground from './components/OpencvPlayground'
+import SocketPlayground from './components/SocketPlayground'
 import './App.css'
 
 class App extends Component {
@@ -43,6 +44,12 @@ class App extends Component {
             name="2"
           >OpenCV Playground
           </button>
+          <button
+            className={this.state.activeTab === '3' ? 'tab-button active-tab-button' : 'tab-button inactive-tab-button'}
+            onClick={this.showTab}
+            name="3"
+          >Socket Playground
+          </button>
         </div>
         <div className="App-body" >
           {
@@ -52,7 +59,10 @@ class App extends Component {
             this.state.activeTab === '1' ?
               <VideoRecognition />
             :
+            this.state.activeTab === '2' ?
               <OpencvPlayground />
+            :
+              <SocketPlayground />
           }
         </div>
 

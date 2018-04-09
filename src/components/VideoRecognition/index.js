@@ -18,7 +18,9 @@ class VideoRecognition extends Component {
 
   startOrStopRecord = () => {
     if (!this.state.streaming) {
-      const resolution = { width: { exact: 300 }, height: { exact: 300 } }
+      const resolution = { width: { exact: 500 }, height: { exact: 500 } }
+      this.videoElem.width = 500
+      this.videoElem.height = 500
       this.startCamera(resolution)
     } else {
       this.stopCamera()
@@ -50,17 +52,16 @@ class VideoRecognition extends Component {
       let src = new window.cv.Mat(this.videoElem.videoHeight, this.videoElem.videoWidth, window.cv.CV_8UC4)
       let dst = new window.cv.Mat(this.videoElem.videoHeight, this.videoElem.videoWidth, window.cv.CV_8UC1)
       let cap = new window.cv.VideoCapture(this.videoElem)
-      console.log(cap)
       const FPS = 30;
       const processFrames = () => {
         if (!this.state.streaming) {
           src.delete()
           dst.delete()
+          console.log('src, dst of processVideo deleted')
           return
         }
         let begin = Date.now()
         cap.read(src)
-        console.log()
         window.cv.cvtColor(src, dst, window.cv.COLOR_RGBA2GRAY)
         window.cv.imshow(this.canvasOutput, dst)
         let delay = 1000/FPS - (Date.now() - begin)
@@ -72,6 +73,13 @@ class VideoRecognition extends Component {
     }
     
   }
+
+  // foo = () => {
+  //   const bar = () => {
+  //     this.canvasInputCtx.drawImage(this.videoElem, 0, 0, this.canvasOutput.width, this.canvasOutput.height)
+  //   }
+  //   this.interId = setInterval(bar, 1)
+  // }
 
   drawVideoToInputCanvas = () => {
     let src = new window.cv.Mat(this.videoElem.videoHeight, this.videoElem.videoWidth, window.cv.CV_8UC4)
@@ -96,16 +104,14 @@ class VideoRecognition extends Component {
   onVideoStarted = () => {
     console.log('in onVideoStarted')
     this.setState({ streaming: true })
-    this.videoElem.height = this.videoElem.videoHeight
-    this.videoElem.width = this.videoElem.videoWidth
-    this.canvasInputCtx = this.canvasInput.getContext('2d')
-    this.canvasOutputCtx = this.canvasOutput.getContext('2d')
     this.drawVideoToInputCanvas()
+    // this.foo()
   }
 
   onVideoStopped = () => {
     console.log('in onVideoStopped')
     this.setState({ streaming: false })
+    // clearInterval(this.interId)
     this.canvasOutputCtx.clearRect(0, 0, this.canvasOutput.width, this.canvasOutput.height)
     this.canvasInputCtx.clearRect(0, 0, this.canvasOutput.width, this.canvasOutput.height)
   }
@@ -115,23 +121,29 @@ class VideoRecognition extends Component {
   }
 
   setCanvasVideoOutputRef = (canvasOutputElem) => {
-    this.canvasOutput = canvasOutputElem
+    if(canvasOutputElem) {
+      this.canvasOutput = canvasOutputElem
+      this.canvasOutputCtx = this.canvasOutput.getContext('2d')
+    }
   }
 
   setCanvasVideoInputRef = (canvasInputElem) => {
-    this.canvasInput = canvasInputElem
+    if(canvasInputElem) {
+      this.canvasInput = canvasInputElem
+      this.canvasInputCtx = this.canvasInput.getContext('2d')
+    }
+    
   }
 
-  toShowErrorMsg
-
   render() {
+    console.log('in VideoRecognition render, state is',this.state )
     return (
       <div className="App-body-video-capture" >
         <div className="video-and-result" >
           <video
             className="video-holder"
             ref={this.setVideoEleRef}
-            onCanPlay={this.onVideoStarted}
+            onPlay={this.onVideoStarted}
           />
           <canvas ref={this.setCanvasVideoInputRef} className="canvas-video-holder" />
           <canvas ref={this.setCanvasVideoOutputRef} className="canvas-video-holder" />
