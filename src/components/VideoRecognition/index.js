@@ -1,14 +1,16 @@
-import React, { Component } from 'react'
+import React, {Component} from 'react'
+import io from 'socket.io-client'
 import { recognizeImage } from '../../controller'
-import './VideoRecognition.css'
+import questionMarkImage from '../../images/DramaticQuestionMark.png'
+import './SocketPlayground.css'
 
 class VideoRecognition extends Component {
   constructor(props) {
+    console.log('constructor of VideoRecognition called')
     super(props)
-    this.state = { streaming: false, toShowErrorMsg: false }
+    this.state = { streaming: false, toShowErrorMsg: false, predictions: null }
     this.videoElem = null
     this.videoStream = null
-    this.canvasOutput = null
     this.canvasInput = null
   }
 
@@ -16,13 +18,15 @@ class VideoRecognition extends Component {
     this.setState({ toShowErrorMsg: true })
   }
 
-  startOrStopRecord = () => {
+  startOrStopCapture = () => {
     if (!this.state.streaming) {
       const resolution = { width: { exact: 500 }, height: { exact: 500 } }
       this.videoElem.width = 500
       this.videoElem.height = 500
       this.startCamera(resolution)
     } else {
+      this.stopSendingFrameToServer()
+      this.disconnectFromServer()
       this.stopCamera()
       this.onVideoStopped()
     }
@@ -47,44 +51,44 @@ class VideoRecognition extends Component {
     this.videoStream.getVideoTracks()[0].stop()
   }
 
+  streamVideoToServer = () => {
+    const sendFrameToServer = () =>{
+      this.socket.emit('recognizeFrame', this.canvasInput.toDataURL('image/webp'))
+    } 
+    this.sendFrameIntId = setInterval(sendFrameToServer, 100)
+  }
+
+  setupConnectionWithServer = () => {
+    this.socket = io.connect('http://localhost:7000')
+  }
+
+  registerResponseEvent = () => {
+    this.socket.on('frameImageClass', predictions => this.savePredictions(predictions))
+  }
+
+  stopSendingFrameToServer = () => {
+    clearInterval(this.sendFrameIntId)
+  }
+
+  disconnectFromServer = () => {
+    this.socket.disconnect()
+  }
+
+
   processVideo = () => {
     if(this.state.streaming) {
-      let src = new window.cv.Mat(this.videoElem.videoHeight, this.videoElem.videoWidth, window.cv.CV_8UC4)
-      let dst = new window.cv.Mat(this.videoElem.videoHeight, this.videoElem.videoWidth, window.cv.CV_8UC1)
-      let cap = new window.cv.VideoCapture(this.videoElem)
-      const FPS = 30;
-      const processFrames = () => {
-        if (!this.state.streaming) {
-          src.delete()
-          dst.delete()
-          console.log('src, dst of processVideo deleted')
-          return
-        }
-        let begin = Date.now()
-        cap.read(src)
-        window.cv.cvtColor(src, dst, window.cv.COLOR_RGBA2GRAY)
-        window.cv.imshow(this.canvasOutput, dst)
-        let delay = 1000/FPS - (Date.now() - begin)
-        setTimeout(processFrames, delay)
-      }
-      setTimeout(processFrames, 0)
+      this.setupConnectionWithServer()
+      this.registerResponseEvent()
+      this.streamVideoToServer()
     } else {
       this.showErrorMsg()
     }
-    
+    console.log('returning from processVideo func')
   }
-
-  // foo = () => {
-  //   const bar = () => {
-  //     this.canvasInputCtx.drawImage(this.videoElem, 0, 0, this.canvasOutput.width, this.canvasOutput.height)
-  //   }
-  //   this.interId = setInterval(bar, 1)
-  // }
 
   drawVideoToInputCanvas = () => {
     let src = new window.cv.Mat(this.videoElem.videoHeight, this.videoElem.videoWidth, window.cv.CV_8UC4)
     let cap = new window.cv.VideoCapture(this.videoElem);
-    console.log(cap, src)
     const FPS = 30;
     const drawFrameToInputCanvas = () => {
       if (!this.state.streaming) {
@@ -101,30 +105,25 @@ class VideoRecognition extends Component {
     setTimeout(drawFrameToInputCanvas, 0);
   }
 
+  savePredictions = (predictions) => {
+    console.log('predictions from server ', predictions)
+    this.setState({ predictions })
+  }
+
   onVideoStarted = () => {
     console.log('in onVideoStarted')
     this.setState({ streaming: true })
     this.drawVideoToInputCanvas()
-    // this.foo()
   }
 
   onVideoStopped = () => {
     console.log('in onVideoStopped')
     this.setState({ streaming: false })
-    // clearInterval(this.interId)
-    this.canvasOutputCtx.clearRect(0, 0, this.canvasOutput.width, this.canvasOutput.height)
-    this.canvasInputCtx.clearRect(0, 0, this.canvasOutput.width, this.canvasOutput.height)
+    this.canvasInputCtx.clearRect(0, 0, this.canvasInput.width, this.canvasInput.height)
   }
 
   setVideoEleRef = (videoElem) => {
     this.videoElem = videoElem
-  }
-
-  setCanvasVideoOutputRef = (canvasOutputElem) => {
-    if(canvasOutputElem) {
-      this.canvasOutput = canvasOutputElem
-      this.canvasOutputCtx = this.canvasOutput.getContext('2d')
-    }
   }
 
   setCanvasVideoInputRef = (canvasInputElem) => {
@@ -136,7 +135,7 @@ class VideoRecognition extends Component {
   }
 
   render() {
-    console.log('in VideoRecognition render, state is',this.state )
+    console.log('in SocketPlayground render, state is',this.state )
     return (
       <div className="App-body-video-capture" >
         <div className="video-and-result" >
@@ -146,9 +145,20 @@ class VideoRecognition extends Component {
             onPlay={this.onVideoStarted}
           />
           <canvas ref={this.setCanvasVideoInputRef} className="canvas-video-holder" />
-          <canvas ref={this.setCanvasVideoOutputRef} className="canvas-video-holder" />
+          <div className="canvas-video-holder result-holder">
+            {
+              this.state.predictions ?
+              (
+                <ul>
+                  {this.state.predictions.map(prediction => <li key={prediction} >{prediction}</li>)}
+                </ul>
+              )
+              :
+                <img className="question-image" src={questionMarkImage} alt="questionmark" />
+            }
+          </div>
         </div>
-        <button className="capture-video-button" onClick={this.startOrStopRecord}>
+        <button className="capture-video-button" onClick={this.startOrStopCapture}>
           {this.state.streaming ? 'Stop capture' : 'Start capture'}
         </button>
         <button className="action-button" onClick={this.processVideo}>Process Video</button>
@@ -159,3 +169,116 @@ class VideoRecognition extends Component {
 }
 
 export default VideoRecognition
+
+
+// class SocketPlayground extends Component {
+//   constructor(props) {
+//     super(props)
+//     this.state = {
+//       selectedFile: null,
+//       toShowErrorMsg: false,
+//       predictions: null,
+//     }
+//     this.socket = io.connect('http://localhost:7000')
+//     this.socket.on('imageClass', predictions => this.savePredictions(predictions))
+//   }
+
+//   uploadHandler = () => {
+//     if (this.state.selectedFile) {
+//       this.socket.emit('recognizeImage', this.state.selectedFile)
+//     } else {
+//       this.showErrorMsg()
+//     }
+//   }
+
+//   savePredictions = (predictions) => {
+//     console.log('predictions from server ', predictions)
+//     this.setState({ predictions })
+//   }
+
+//   showErrorMsg = () => {
+//     this.setState({ toShowErrorMsg: true })
+//   }
+
+//   setImageFile = (event) => {
+//     this.setState({ selectedFile: event.target.files[0], toShowErrorMsg: false })
+//   }
+
+//   render() {
+//     return (
+//       <div className="App-body-img-selector" >
+//         <div className="image-and-result">
+//           <img
+//             src={this.state.selectedFile ? window.URL.createObjectURL(this.state.selectedFile) : defaultImage}
+//             alt="selected img"
+//             className={this.state.selectedFile ? 'image-holder' : ''}
+//           />
+//           {
+//             this.state.selectedFile ?
+//             (
+//               <div className="is-and-result" >
+//                 <div className="is-holder" >
+//                 is
+//                 </div>
+//                 <div className="result-holder">
+//                   {
+//                     this.state.predictions ?
+//                     (
+//                       <ul>
+//                         {this.state.predictions.map(prediction => <li key={prediction} >{prediction}</li>)}
+//                       </ul>
+//                     )
+//                     :
+//                       <img className="question-image" src={questionMarkImage} alt="questionmark" />
+//                   }
+//                 </div>
+//               </div>
+//             )
+//             :
+//             ''
+//           }
+
+//         </div>
+//         <div className="image-input" >
+//           <button className="image-selection-button"> Pick an image </button>
+//           <input type="file" onChange={this.setImageFile} />
+//         </div>
+
+//         <button className="action-button" onClick={this.uploadHandler}>Recognize!</button>
+//         <div className="error-msg">{this.state.toShowErrorMsg ? 'Please select an image and then press recognize' : ''}</div>
+//       </div>
+//     )
+//   }
+// }
+
+// export default SocketPlayground
+
+
+// class SocketPlayground extends Component {
+//   constructor(props) {
+//     super(props)
+//     this.socket = io.connect('http://localhost:7000')
+//     this.socket.on('timeFromServer', timeStamp => this.setState({timeStamp}))
+//     this.state = {timeStamp: 'no time received yet'}
+//   }
+
+//   componentWillMount = () => {
+//     console.log('in componentWillMount of SocketPlayground')
+//   }
+
+//   sendPing = () => {
+//     this.socket.emit('getTimeFromServer', 'ping!ping!ping!')
+//   }
+
+//   render() {
+//     console.log('in render of SocketPlayground, this value is ', this)
+//     return (
+//       <div>
+//         <button onClick={this.sendPing}>Ping server for time</button>
+//         <p>{this.state.timeStamp}</p>
+//       </div>
+//     )
+//   }
+// }
+
+// export default SocketPlayground

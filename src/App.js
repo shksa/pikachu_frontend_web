@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import ImageRecognition from './components/ImageRecognition'
-import VideoRecognition from './components/VideoRecognition'
+import VideoProcessing from './components/VideoProcessing'
 import OpencvPlayground from './components/OpencvPlayground'
-import SocketPlayground from './components/SocketPlayground'
+import VideoRecognition from './components/VideoRecognition'
 import './App.css'
 
 class App extends Component {
@@ -30,13 +30,13 @@ class App extends Component {
             className={this.state.activeTab === '0' ? 'tab-button active-tab-button' : 'tab-button inactive-tab-button'}
             onClick={this.showTab}
             name="0"
-          >Image recognition
+          >Image Recognition
           </button>
           <button
             className={this.state.activeTab === '1' ? 'tab-button active-tab-button' : 'tab-button inactive-tab-button'}
             onClick={this.showTab}
             name="1"
-          >Video recognition
+          >Video Processing 
           </button>
           <button
             className={this.state.activeTab === '2' ? 'tab-button active-tab-button' : 'tab-button inactive-tab-button'}
@@ -48,7 +48,7 @@ class App extends Component {
             className={this.state.activeTab === '3' ? 'tab-button active-tab-button' : 'tab-button inactive-tab-button'}
             onClick={this.showTab}
             name="3"
-          >Socket Playground
+          >Video Recognition
           </button>
         </div>
         <div className="App-body" >
@@ -57,12 +57,12 @@ class App extends Component {
               <ImageRecognition />
             :
             this.state.activeTab === '1' ?
-              <VideoRecognition />
+              <VideoProcessing />
             :
             this.state.activeTab === '2' ?
               <OpencvPlayground />
             :
-              <SocketPlayground />
+              <VideoRecognition />
           }
         </div>
 
