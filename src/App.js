@@ -3,6 +3,7 @@ import ImageRecognition from './components/ImageRecognition'
 import VideoProcessing from './components/VideoProcessing'
 import OpencvPlayground from './components/OpencvPlayground'
 import VideoRecognition from './components/VideoRecognition'
+import ObjectDetectionInVideo from './components/ObjectDetectionInVideo'
 import './App.css'
 
 class App extends Component {
@@ -50,6 +51,12 @@ class App extends Component {
             name="3"
           >Video Recognition
           </button>
+          <button
+            className={this.state.activeTab === '4' ? 'tab-button active-tab-button' : 'tab-button inactive-tab-button'}
+            onClick={this.showTab}
+            name="3"
+          >Object Detection InVideo
+          </button>
         </div>
         <div className="App-body" >
           {
@@ -62,7 +69,10 @@ class App extends Component {
             this.state.activeTab === '2' ?
               <OpencvPlayground />
             :
+            this.state.activeTab === '3' ?
               <VideoRecognition />
+            :
+              <ObjectDetectionInVideo />
           }
         </div>
 

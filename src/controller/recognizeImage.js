@@ -1,8 +1,6 @@
-const recognizeImage = (imageFile) => {
-  console.log('in recognizeImage func')
+export const recognizeImage = (imageData) => {
   const formData = new FormData()
-  formData.append('userName', 'guest')
-  formData.append('imageFile', imageFile)
+  formData.append('imageData', imageData)
   return fetch('/recognizeImage', {
     method: 'POST',
     body: formData,
@@ -14,6 +12,4 @@ const recognizeImage = (imageFile) => {
     })
     .catch(error => console.log(error))
 };
-
-module.exports = { recognizeImage }
 

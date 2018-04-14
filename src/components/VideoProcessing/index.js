@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import { recognizeImage } from '../../controller'
 import './VideoProcessing.css'
 
 class VideoProcessing extends Component {
