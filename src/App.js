@@ -22,7 +22,6 @@ class App extends Component {
     console.log('in render, state is ', this.state)
     return (
       <div className="App">
-        <div id="openCVloader" style={{textAlign: 'center'}}>OpenCV.js is loading ...</div>
         <div className="App-header" >
           Pikachu
         </div>
@@ -37,7 +36,7 @@ class App extends Component {
             className={this.state.activeTab === '1' ? 'tab-button active-tab-button' : 'tab-button inactive-tab-button'}
             onClick={this.showTab}
             name="1"
-          >Video Processing 
+          >Video Processing
           </button>
           <button
             className={this.state.activeTab === '2' ? 'tab-button active-tab-button' : 'tab-button inactive-tab-button'}
@@ -54,7 +53,7 @@ class App extends Component {
           <button
             className={this.state.activeTab === '4' ? 'tab-button active-tab-button' : 'tab-button inactive-tab-button'}
             onClick={this.showTab}
-            name="3"
+            name="4"
           >Object Detection InVideo
           </button>
         </div>

@@ -47,10 +47,10 @@ class VideoProcessing extends Component {
   }
 
   processVideo = () => {
-    if(this.state.streaming) {
-      let src = new window.cv.Mat(this.videoElem.videoHeight, this.videoElem.videoWidth, window.cv.CV_8UC4)
-      let dst = new window.cv.Mat(this.videoElem.videoHeight, this.videoElem.videoWidth, window.cv.CV_8UC1)
-      let cap = new window.cv.VideoCapture(this.videoElem)
+    if (this.state.streaming) {
+      const src = new window.cv.Mat(this.videoElem.videoHeight, this.videoElem.videoWidth, window.cv.CV_8UC4)
+      const dst = new window.cv.Mat(this.videoElem.videoHeight, this.videoElem.videoWidth, window.cv.CV_8UC1)
+      const cap = new window.cv.VideoCapture(this.videoElem)
       const FPS = 30;
       const processFrames = () => {
         if (!this.state.streaming) {
@@ -59,18 +59,17 @@ class VideoProcessing extends Component {
           console.log('src, dst of processVideo deleted')
           return
         }
-        let begin = Date.now()
+        const begin = Date.now()
         cap.read(src)
         window.cv.cvtColor(src, dst, window.cv.COLOR_RGBA2GRAY)
         window.cv.imshow(this.canvasOutput, dst)
-        let delay = 1000/FPS - (Date.now() - begin)
+        const delay = (1000 / FPS) - (Date.now() - begin)
         setTimeout(processFrames, delay)
       }
       setTimeout(processFrames, 0)
     } else {
       this.showErrorMsg()
     }
-    
   }
 
   // foo = () => {
@@ -81,8 +80,8 @@ class VideoProcessing extends Component {
   // }
 
   drawVideoToInputCanvas = () => {
-    let src = new window.cv.Mat(this.videoElem.videoHeight, this.videoElem.videoWidth, window.cv.CV_8UC4)
-    let cap = new window.cv.VideoCapture(this.videoElem);
+    const src = new window.cv.Mat(this.videoElem.videoHeight, this.videoElem.videoWidth, window.cv.CV_8UC4)
+    const cap = new window.cv.VideoCapture(this.videoElem);
     console.log(cap, src)
     const FPS = 30;
     const drawFrameToInputCanvas = () => {
@@ -91,10 +90,10 @@ class VideoProcessing extends Component {
         console.log('src of drawVideoToInputCanvas deleted')
         return;
       }
-      let begin = Date.now();
+      const begin = Date.now();
       cap.read(src);
       window.cv.imshow(this.canvasInput, src);
-      let delay = 1000/FPS - (Date.now() - begin);
+      const delay = 1000 / FPS - (Date.now() - begin);
       setTimeout(drawFrameToInputCanvas, delay);
     }
     setTimeout(drawFrameToInputCanvas, 0);
@@ -120,22 +119,21 @@ class VideoProcessing extends Component {
   }
 
   setCanvasVideoOutputRef = (canvasOutputElem) => {
-    if(canvasOutputElem) {
+    if (canvasOutputElem) {
       this.canvasOutput = canvasOutputElem
       this.canvasOutputCtx = this.canvasOutput.getContext('2d')
     }
   }
 
   setCanvasVideoInputRef = (canvasInputElem) => {
-    if(canvasInputElem) {
+    if (canvasInputElem) {
       this.canvasInput = canvasInputElem
       this.canvasInputCtx = this.canvasInput.getContext('2d')
     }
-    
   }
 
   render() {
-    console.log('in VideoRecognition render, state is',this.state )
+    console.log('in VideoRecognition render, state is', this.state)
     return (
       <div className="App-body-video-capture" >
         <div className="video-and-result" >

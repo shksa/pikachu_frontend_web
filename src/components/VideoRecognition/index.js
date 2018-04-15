@@ -16,7 +16,6 @@ class VideoRecognition extends Component {
     }
   }
 
-
   toggleCameraStream = () => {
     if (this.state.cameraIsStreaming) {
       if (this.state.videoIsProcessing) {
@@ -36,7 +35,7 @@ class VideoRecognition extends Component {
     navigator.mediaDevices.getUserMedia(videoConstraints)
       .then((mediaStream) => {
         this.videoElem.srcObject = mediaStream
-        this.videoElem.onloadedmetadata = (e) => {
+        this.videoElem.onloadedmetadata = () => {
           this.videoElem.play()
         }
         this.videoStream = mediaStream
@@ -87,7 +86,6 @@ class VideoRecognition extends Component {
     this.setState({ videoIsProcessing: false, predictions: false })
   }
 
-
   toggleVideoProcessing = () => {
     if (this.state.videoIsProcessing) {
       this.stopVideoProcessing()
@@ -119,7 +117,7 @@ class VideoRecognition extends Component {
       const begin = Date.now();
       cap.read(src);
       window.cv.imshow(this.canvasInput, src);
-      const delay = 1000 / FPS - (Date.now() - begin);
+      const delay = (1000 / FPS) - (Date.now() - begin);
       setTimeout(drawFrameToInputCanvas, delay);
     }
     setTimeout(drawFrameToInputCanvas, 0);
