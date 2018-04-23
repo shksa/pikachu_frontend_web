@@ -51,7 +51,8 @@ class VideoRecognition extends Component {
   }
 
   setupConnectionWithServer = () => {
-    this.socket = io.connect('http://localhost:7000')
+    this.socket = io('http://localhost:7000')
+    this.socket.on('helloToClient', msg => console.log(`connected to server and received Ack ${msg}`))
   }
 
   registerResponseEvent = () => {
@@ -124,7 +125,7 @@ class VideoRecognition extends Component {
   }
 
   savePredictions = (predictions) => {
-    console.log('predictions from server ', predictions)
+    // console.log('predictions from server ', predictions)
     this.setState({ predictions })
   }
 

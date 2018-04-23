@@ -11,7 +11,6 @@ class ObjectDetectionInVideo extends Component {
       cameraIsStreaming: false,
       videoIsProcessing: false,
       toShowErrorMsg1: false,
-      toShowErrorMsg2: false,
       predictions: null,
     }
   }
@@ -51,12 +50,9 @@ class ObjectDetectionInVideo extends Component {
   }
 
   setupConnectionWithServer = () => {
-    this.socket = io.connect('http://localhost:7000')
+    this.socket = io('http://localhost:7000')
+    this.socket.on('helloToClient', msg => console.log(`connected to server and received Ack ${msg}`))
   }
-
-  // registerResponseEvent = () => {
-  //   this.socket.on('frameImagePredictions', predictions => this.savePredictions(predictions))
-  // }
 
   streamVideoToServer = () => {
     const sendFrameToServer = () => {
@@ -64,19 +60,6 @@ class ObjectDetectionInVideo extends Component {
       this.socket.emit('detectObjectsInFrame', base64EncodedFrame, predictions => this.savePredictions(predictions))
     }
     this.sendFrameIntId = setInterval(sendFrameToServer, 1000)
-  }
-
-  drawBoundingBoxesForObjects = (predictions, frame) => {
-    predictions.forEach((p) => {
-      this.drawRectInOutputCanvas(frame, p.rect)
-    })
-  }
-
-  drawRectInOutputCanvas = (frame, rect) => {
-    const point1 = new window.cv.Point(rect.x, rect.y);
-    const point2 = new window.cv.Point(rect.x + rect.width, rect.y + rect.height)
-    window.cv.rectangle(frame, point1, point2, [255, 0, 0, 255])
-    window.cv.imshow(this.canvasOutput, frame)
   }
 
   stopSendingFrameToServer = () => {
@@ -92,11 +75,6 @@ class ObjectDetectionInVideo extends Component {
     this.streamVideoToServer()
     this.setState({ videoIsProcessing: true })
   }
-  // startVideoProcessing = () => {
-  //   this.setupConnectionWithServer()
-  //   this.drawVideoToOutputCanvas()
-  //   this.setState({ videoIsProcessing: true })
-  // }
 
   stopVideoProcessing = () => {
     this.stopSendingFrameToServer()
@@ -120,6 +98,17 @@ class ObjectDetectionInVideo extends Component {
     } else {
       this.setState({ toShowErrorMsg2: true })
     }
+  }
+
+  drawBoundingBoxesForObjects = (predictions, frame) => {
+    predictions.forEach((pred) => {
+      this.drawRectInOutputCanvas(frame, pred)
+    })
+  }
+
+  drawRectInOutputCanvas = (frame, pred) => {
+    window.cv.rectangle(frame, pred.bottomLeft, pred.topRight, [255, 0, 0, 255])
+    window.cv.imshow(this.canvasOutput, frame)
   }
 
   drawVideoToInputCanvas = () => {
@@ -146,34 +135,6 @@ class ObjectDetectionInVideo extends Component {
     }
     setTimeout(drawFrameToInputCanvas, 0)
   }
-
-  // drawVideoToOutputCanvas = () => {
-  //   const src = new window.cv.Mat(this.videoElem.videoHeight, this.videoElem.videoWidth, window.cv.CV_8UC4)
-  //   const dst = new window.cv.Mat(this.videoElem.videoHeight, this.videoElem.videoWidth, window.cv.CV_8UC4)
-  //   const cap = new window.cv.VideoCapture(this.videoElem)
-  //   const FPS = 30
-  //   const drawFrameToOutputCanvas = () => {
-  //     if (!this.state.cameraIsStreaming) {
-  //       src.delete()
-  //       dst.delete()
-  //       console.log('src, dst of drawVideoToInputCanvas deleted')
-  //       return
-  //     }
-  //     const begin = Date.now()
-  //     cap.read(src)
-  //     window.cv.imshow(this.canvasInput, src)
-  //     const base64EncodedFrame = this.canvasInput.toDataURL('image/webp')
-  //     src.copyTo(dst)
-  //     this.socket.emit(
-  //       'detectObjectsInFrame',
-  //       base64EncodedFrame,
-  //       predictions => this.drawBoundingBoxesForObjects(predictions, dst),
-  //     )
-  //     const delay = (1000 / FPS) - (Date.now() - begin)
-  //     setTimeout(drawFrameToOutputCanvas, delay)
-  //   }
-  //   setTimeout(drawFrameToOutputCanvas, 0)
-  // }
 
   savePredictions = (predictions) => {
     // console.log('predictions from server ', predictions)
@@ -226,7 +187,6 @@ class ObjectDetectionInVideo extends Component {
               :
                 <img src={questionMarkImage} alt="question mark" className="question-image" />
             }
-
           </div>
         </div>
         <button className="capture-video-button" onClick={this.toggleCameraStream}>
