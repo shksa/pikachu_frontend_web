@@ -14,6 +14,7 @@ module.exports = {
         "react/sort-comp": 0,
         "react/prop-types": 0,
         "import/prefer-default-export": 0,
-        "no-nested-ternary": 0
+        "no-nested-ternary": 0,
+        "no-return-assign": 0
     }
 };

@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import io from 'socket.io-client'
-import questionMarkImage from '../../images/DramaticQuestionMark.png'
 import './ObjectDetectionInVideo.css'
 
 class ObjectDetectionInVideo extends Component {
@@ -11,7 +10,6 @@ class ObjectDetectionInVideo extends Component {
       cameraIsStreaming: false,
       videoIsProcessing: false,
       toShowErrorMsg1: false,
-      predictions: null,
     }
   }
 
@@ -43,27 +41,35 @@ class ObjectDetectionInVideo extends Component {
   }
 
   stopCameraStream = () => {
+    this.stopDrawingToInput()
+    this.deleteMats()
     this.videoElem.pause()
     this.videoElem.srcObject = null
     this.videoStream.getVideoTracks()[0].stop()
     this.setState({ cameraIsStreaming: false })
   }
 
+  stopDrawingToInput = () => clearTimeout(this.drawFrameId)
+
   setupConnectionWithServer = () => {
     this.socket = io('http://localhost:7000')
-    this.socket.on('helloToClient', msg => console.log(`connected to server and received Ack ${msg}`))
+    this.socket.on('helloToClient', msg => console.log(`connected to server and received Ack "${msg}" from server`))
   }
 
   streamVideoToServer = () => {
     const sendFrameToServer = () => {
+      const start = Date.now();
       const base64EncodedFrame = this.canvasInput.toDataURL('image/webp')
-      this.socket.emit('detectObjectsInFrame', base64EncodedFrame, predictions => this.savePredictions(predictions))
+      this.socket.emit('detectObjectsInFrame', base64EncodedFrame, (predictions) => {
+        this.drawBoundingBoxesForObjects(predictions)
+        this.sendFrameId = setTimeout(sendFrameToServer, Date.now() - start)
+      })
     }
-    this.sendFrameIntId = setInterval(sendFrameToServer, 1000)
+    setTimeout(sendFrameToServer, 0)
   }
 
   stopSendingFrameToServer = () => {
-    clearInterval(this.sendFrameIntId)
+    clearTimeout(this.sendFrameId)
   }
 
   disconnectFromServer = () => {
@@ -79,7 +85,7 @@ class ObjectDetectionInVideo extends Component {
   stopVideoProcessing = () => {
     this.stopSendingFrameToServer()
     this.disconnectFromServer()
-    this.setState({ videoIsProcessing: false, predictions: false })
+    this.setState({ videoIsProcessing: false })
   }
 
   toggleVideoProcessing = () => {
@@ -100,45 +106,36 @@ class ObjectDetectionInVideo extends Component {
     }
   }
 
-  drawBoundingBoxesForObjects = (predictions, frame) => {
+  drawBoundingBoxesForObjects = (predictions) => {
     predictions.forEach((pred) => {
-      this.drawRectInOutputCanvas(frame, pred)
+      window.cv.rectangle(this.dst, pred.bottomLeft, pred.topRight, [255, 0, 0, 255])
     })
-  }
-
-  drawRectInOutputCanvas = (frame, pred) => {
-    window.cv.rectangle(frame, pred.bottomLeft, pred.topRight, [255, 0, 0, 255])
-    window.cv.imshow(this.canvasOutput, frame)
+    window.cv.imshow(this.canvasOutput, this.dst)
   }
 
   drawVideoToInputCanvas = () => {
     const src = new window.cv.Mat(this.videoElem.videoHeight, this.videoElem.videoWidth, window.cv.CV_8UC4)
-    const dst = new window.cv.Mat(this.videoElem.videoHeight, this.videoElem.videoWidth, window.cv.CV_8UC4)
+    // const dst = new window.cv.Mat(this.videoElem.videoHeight, this.videoElem.videoWidth, window.cv.CV_8UC4)
+    this.dst = new window.cv.Mat(this.videoElem.videoHeight, this.videoElem.videoWidth, window.cv.CV_8UC4)
     const cap = new window.cv.VideoCapture(this.videoElem)
     const FPS = 30
+    this.deleteMats = () => {
+      src.delete()
+      this.dst.delete()
+    }
     const drawFrameToInputCanvas = () => {
-      if (!this.state.cameraIsStreaming) {
-        src.delete()
-        dst.delete()
-        console.log('src, dst of drawVideoToInputCanvas deleted')
-        return
-      }
       const begin = Date.now()
       cap.read(src)
+      src.copyTo(this.dst)
       window.cv.imshow(this.canvasInput, src)
-      if (this.state.predictions) {
-        src.copyTo(dst)
-        this.drawBoundingBoxesForObjects(this.state.predictions, dst)
-      }
+      // if (this.predictions) {
+      //   src.copyTo(dst)
+      //   this.drawBoundingBoxesForObjects(this.predictions, dst)
+      // }
       const delay = (1000 / FPS) - (Date.now() - begin)
-      setTimeout(drawFrameToInputCanvas, delay)
+      this.drawFrameId = setTimeout(drawFrameToInputCanvas, delay)
     }
     setTimeout(drawFrameToInputCanvas, 0)
-  }
-
-  savePredictions = (predictions) => {
-    // console.log('predictions from server ', predictions)
-    this.setState({ predictions })
   }
 
   onVideoStarted = () => {
@@ -181,12 +178,7 @@ class ObjectDetectionInVideo extends Component {
           />
           <canvas ref={this.setCanvasVideoInputRef} className="canvas-video-holder" />
           <div className="canvas-video-holder result-holder">
-            {
-              this.state.predictions ?
-                <canvas ref={this.setCanvasOutputRef} style={{ width: '100%', height: '100%' }} />
-              :
-                <img src={questionMarkImage} alt="question mark" className="question-image" />
-            }
+            <canvas ref={this.setCanvasOutputRef} style={{ width: '100%', height: '100%' }} />
           </div>
         </div>
         <button className="capture-video-button" onClick={this.toggleCameraStream}>
