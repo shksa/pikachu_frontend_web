@@ -20,7 +20,7 @@ class ObjectDetectionInVideo extends Component {
         this.stopVideoProcessing()
       }
       this.stopCameraStream()
-      this.cleanCanvas()
+      this.cleanCanvas(this.canvasInputCtx, this.canvasInput)
     } else {
       this.startCameraStream()
     }
@@ -62,7 +62,6 @@ class ObjectDetectionInVideo extends Component {
       const start = Date.now();
       const base64EncodedFrame = this.canvasInput.toDataURL('image/webp')
       this.socket.emit('detectObjectsInFrame', base64EncodedFrame, (predictions) => {
-        // this.drawBoundingBoxesForObjects(predictions)
         this.predictions = predictions
         this.sendFrameId = setTimeout(sendFrameToServer, Date.now() - start)
       })
@@ -87,6 +86,8 @@ class ObjectDetectionInVideo extends Component {
   stopVideoProcessing = () => {
     this.stopSendingFrameToServer()
     this.disconnectFromServer()
+    this.predictions = null
+    this.cleanCanvas(this.canvasOutputCtx, this.canvasOutput)
     this.setState({ videoIsProcessing: false })
   }
 
@@ -115,21 +116,8 @@ class ObjectDetectionInVideo extends Component {
     window.cv.imshow(this.canvasOutput, this.dst)
   }
 
-  // drawBoundingBoxesForObjects = (predictions) => {
-  //   this.canvasBoxesCtx.clearRect(0, 0, this.canvasBoxes.width, this.canvasBoxes.height)
-  //   predictions.forEach((pred) => {
-  //     this.canvasBoxesCtx.beginPath();
-  //     this.canvasBoxesCtx.strokeStyle = 'red';
-  //     this.canvasBoxesCtx.rect(pred.bottomLeft.x, pred.topRight.y, pred.bottomLeft.y, pred.topRight.x);
-  //     this.canvasBoxesCtx.stroke();
-  //     console.log(pred)
-  //   })
-  // }
-
-
   drawVideoToInputCanvas = () => {
     const src = new window.cv.Mat(this.videoElem.videoHeight, this.videoElem.videoWidth, window.cv.CV_8UC4)
-    // const dst = new window.cv.Mat(this.videoElem.videoHeight, this.videoElem.videoWidth, window.cv.CV_8UC4)
     this.dst = new window.cv.Mat(this.videoElem.videoHeight, this.videoElem.videoWidth, window.cv.CV_8UC4)
     const cap = new window.cv.VideoCapture(this.videoElem)
     const FPS = 30
@@ -142,7 +130,6 @@ class ObjectDetectionInVideo extends Component {
       cap.read(src)
       src.copyTo(this.dst)
       window.cv.imshow(this.canvasInput, src)
-      // window.cv.imshow(this.canvasOutput, this.dst)
       if (this.predictions) {
         this.drawBoundingBoxesForObjects(this.predictions)
       }
@@ -158,8 +145,8 @@ class ObjectDetectionInVideo extends Component {
     this.setState({ cameraIsStreaming: true })
   }
 
-  cleanCanvas = () => {
-    this.canvasInputCtx.clearRect(0, 0, this.canvasInput.width, this.canvasInput.height)
+  cleanCanvas = (canvasCtx, canvasElem) => {
+    canvasCtx.clearRect(0, 0, canvasElem.width, canvasElem.height)
   }
 
   setVideoEleRef = (videoElem) => {
@@ -180,13 +167,6 @@ class ObjectDetectionInVideo extends Component {
     }
   }
 
-  setCanvasBoxesRef = (canvasBoxesElem) => {
-    if (canvasBoxesElem) {
-      this.canvasBoxes = canvasBoxesElem
-      this.canvasBoxesCtx = this.canvasBoxes.getContext('2d')
-    }
-  }
-
   render() {
     // console.log('in SocketPlayground render, state is', this.state)
     return (
@@ -198,9 +178,8 @@ class ObjectDetectionInVideo extends Component {
             onPlay={this.onVideoStarted}
           />
           <canvas ref={this.setCanvasVideoInputRef} className="canvas-video-holder" />
-          <div className="canvas-video-holder result-holder foo">
+          <div className="canvas-video-holder result-holder">
             <canvas ref={this.setCanvasOutputRef} className="canvas-out" />
-            <canvas ref={this.setCanvasBoxesRef} className="canvas-out canvas-boxes" />
           </div>
         </div>
         <button className="capture-video-button" onClick={this.toggleCameraStream}>
